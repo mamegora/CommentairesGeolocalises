@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 5px;
+        }
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .filter-container label {
+            white-space: nowrap;
+        }
+        .filter-container input,
+        .filter-container select {
+            width: 200px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .actions button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .details-button {
+            background-color: rgb(59, 59, 216);
+            color: white;
+            border: none;
+        }
+        .delete-button {
+            background-color: rgb(110, 145, 180);
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>Liste de Commentaires Géolocalisés</h3>
+        <div class="filter-container">
+            <label for="date-filter">Filtrer par Date :</label>
+            <input type="date" id="date-filter" name="date-filter">
+            <label for="region-filter">Filtrer par Région :</label>
+            <select id="region-filter" name="region-filter">
+                <option value="">Toutes les Régions</option>
+                <option value="Bas-Saint-Laurent">Bas-Saint-Laurent</option>
+                <option value="Saguenay—Lac-Saint-Jean">Saguenay—Lac-Saint-Jean</option>
+                <option value="Capitale-Nationale">Capitale-Nationale</option>
+                <option value="Mauricie">Mauricie</option>
+                <option value="Estrie">Estrie</option>
+                <option value="Montréal">Montréal</option>
+                <option value="Outaouais">Outaouais</option>
+                <option value="Abitibi-Témiscamingue">Abitibi-Témiscamingue</option>
+                <option value="Côte-Nord">Côte-Nord</option>
+                <option value="Nord-du-Québec">Nord-du-Québec</option>
+                <option value="Gaspésie—Îles-de-la-Madeleine">Gaspésie—Îles-de-la-Madeleine</option>
+                <option value="Chaudière-Appalaches">Chaudière-Appalaches</option>
+                <option value="Laval">Laval</option>
+                <option value="Lanaudière">Lanaudière</option>
+                <option value="Laurentides">Laurentides</option>
+                <option value="Montérégie">Montérégie</option>
+                <option value="Centre-du-Québec">Centre-du-Québec</option>
+            </select>
+            <button type="button" onclick="filterComments()">Filtrer</button>
+        </div>
+        <table id="comment-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>author</th>
+                    <th>Date</th>
+                    <th>region</th>
+                    <th>Commentaiter</th>
+                </tr>
+            </thead>
+            <tbody id="comment-list">
+                <!-- Les commentaires seront affichés ici -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Supposons que vous ayez une liste de commentaires avec leurs dates et leurs régions
+        const commentList = [
+            { id: 1, author: "Eric", date: "2024-05-10", content: "Super commentaire 1", region: "Montréal"},
+             { id: 2, author: "Alice", date: "2024-05-12", content: "Super commentaire 2", region: "Laval" },
+             { id: 3, author: "Bob", date: "2024-05-15", content: "Super commentaire 3", region: "Montérégie" },
+             { id: 4, author: "Moussa", date: "2024-05-10", content: "Super commentaire 1", region: "Outaouais" },
+             { id: 5, author: "Ali", date: "2024-05-12", content: "Super commentaire 2", region: "Lanaudière" },
+             { id: 6, author: "Eric", date: "2024-05-15", content: "Super commentaire 3", region: "Gaspésie—Îles-de-la-Madeleine" }
+            // Ajoutez d'autres commentaires avec des régions différentes
+        ];
+
+        // Fonction pour afficher les commentaires
+        function displayComments(comments) {
+            const commentListContainer = document.getElementById("comment-list");
+            commentListContainer.innerHTML = ""; // Efface le contenu précédent
+            comments.forEach(comment => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><input type="checkbox" data-comment-id="${comment.id}"></td>
+                    <td>${comment.author}</td>
+                    <td>${comment.date}</td>
+                    <td>${comment.region}</td>
+                    <td>${comment.content}</td>
+                    <td class="actions">
+                        <button class="details-button" onclick="showDetails(${comment.id})">Détails</button>
+                        <button class="delete-button" onclick="deleteComment(${comment.id})">Supprimer</button>
+                    </td>
+                `;
+                commentListContainer.appendChild(row);
+            });
+        }
+
+        // Fonction pour filtrer les commentaires par date et par région
+        function filterComments() {
+            const date = document.getElementById("date-filter").value;
+            const region = document.getElementById("region-filter").value;
+            const filteredComments = commentList.filter(comment => {
+                const commentDate = new Date(comment.date);
+                const selectedDate = date ? new Date(date) : null;
+
+                if (selectedDate && commentDate.toDateString() !== selectedDate.toDateString()) {
+                    return false;
+                }
+                if (region && region !== comment.region) {
+                    return false;
+                }
+                return true;
+            });
+            displayComments(filteredComments);
+        }
+
+        // Fonction pour afficher les détails d'un commentaire
+        function showDetails(commentId) {
+            alert("Détails du commentaire avec l'ID : " + commentId);
+            // Ici, vous pouvez implémenter la logique pour afficher les détails du commentaire
+        }
+
+        // Fonction pour supprimer un commentaire
+        function deleteComment(commentId) {
+            alert("Suppression du commentaire avec l'ID : " + commentId);
+            // Ici, vous pouvez implémenter la logique pour supprimer le commentaire
+        }
+
+        // Afficher tous les commentaires au chargement de la page
+        displayComments(commentList);
+    </script>
+</body>
+</body>
+</html>
